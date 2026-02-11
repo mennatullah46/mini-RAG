@@ -6,7 +6,7 @@ Python 3.11 or later
 
 ### Install python using miniconda
 
-1) Download miniconda from [here] (https://www.anaconda.com/download)
+1) Download miniconda from [here] (https://www.anaconda.com/docs/getting-started/miniconda/install)
 
 2) Create a new environment using the follownig command:
 
