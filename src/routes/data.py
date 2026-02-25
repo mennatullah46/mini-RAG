@@ -2,11 +2,12 @@ from fastapi import FastAPI, APIRouter, Depends, UploadFile, status
 from fastapi.responses import JSONResponse
 import os
 from helpers.config import get_settings, Settings
-from controllers.DataController import DataController
-from controllers.ProjectController import ProjectController
+from controllers import DataController
+from controllers import ProjectController
 import aiofiles
-from models.enums.ResponseEnums import ResponseSignal
+from models import ResponseSignal
 import logging
+from schemas.data import ProcessRequest
 
 logger = logging.getLogger('uvicorn.error')
 
@@ -55,3 +56,9 @@ async def upload_data(project_id: str, file: UploadFile,
                 "file_id":file_id
             }
         )
+
+@data_router.post("/process/{project_id}")
+async def process_endpoint(project_id: str, process_request: ProcessRequest):
+    file_id = process_request.file_id
+
+    return file_id
