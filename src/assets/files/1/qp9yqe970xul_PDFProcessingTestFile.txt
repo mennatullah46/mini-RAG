@@ -1,0 +1,25 @@
+PDF Processing Test File
+=========================
+
+Name: Menna 
+Date: 25-02-2026
+Project: Autonomous Rover AI System
+
+This is a sample text file created for testing PDF processing.
+The purpose of this file is to evaluate:
+
+1. Text extraction
+2. Paragraph detection
+3. Line breaks handling
+4. Special characters support
+5. Number recognition (1234567890)
+
+Sample paragraph:
+The rover uses computer vision to detect package serial numbers and 
+place them in the correct warehouse location. The system integrates 
+machine learning models, GPS navigation, and a 6-DoF robotic arm.
+
+Special Characters:
+! @ # $ % ^ & * ( ) _ + - = { } [ ] | \ : ; " ' < > , . ? /
+
+End of test file.

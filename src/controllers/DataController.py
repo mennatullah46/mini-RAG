@@ -1,10 +1,9 @@
 from .BaseController import BaseController
 from fastapi import UploadFile
-from models.enums.ResponseEnums import ResponseSignal
+from models import ResponseSignal
 from .ProjectController import ProjectController
 import re
 import os
-
 
 class DataController(BaseController):
     
