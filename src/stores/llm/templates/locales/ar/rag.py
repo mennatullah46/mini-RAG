@@ -3,6 +3,7 @@ from string import Template
 #### RAG PROMPTS ####
 
 #### System ####
+
 system_prompt = Template("\n".join([
     "أنت مساعد لتوليد رد للمستخدم.",
     "ستحصل على مجموعة من المستندات المرتبطة باستفسار المستخدم.",
@@ -25,5 +26,8 @@ document_prompt = Template(
 #### Footer ####
 footer_prompt = Template("\n".join([
     "بناءً فقط على المستندات المذكورة أعلاه، يرجى توليد إجابة للمستخدم.",
+    "## السؤال:",
+    "$query",
+    "",
     "## الإجابة:",
 ]))
