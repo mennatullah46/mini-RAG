@@ -1,0 +1,39 @@
+stream
+singleton
+why mongo
+docker compose commands
+await
+asyncio
+ssl
+جزاك الله خيرا
+درس مفيد وغني الله يعطيك العافية يا رب
+بماذا تنصحنا يا مهندس لتعلم (Design Pattern for ML and LLM projects)
+
+Reply
+
+
+@bakrianoo
+10 months ago
+ @NourQandos-k9h  
+دول اشهر حاجات لازم تكون عارفهم عامة
+
+1. Factory Pattern
+
+
+2. Strategy Pattern
+
+
+3. Observer Pattern
+
+
+4. Decorator Pattern
+
+
+5. Singleton Pattern
+
+
+6. Adapter Pattern
+
+quantization
+
+lora

@@ -1,26 +1,34 @@
 from fastapi import FastAPI
 from routes import base, data, nlp
-from motor.motor_asyncio import AsyncIOMotorClient
-from contextlib import asynccontextmanager
 from helpers.config import get_settings
 from stores.llm.LLMProviderFactory import LLMProviderFactory
 from stores.vectordb.VectorDBProviderFactory import VectorDBProviderFactory
 from stores.llm.templates.template_parser import TemplateParser
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
+
+from utils.metrics import setup_metrics
+
+app = FastAPI()
+
+#setup prometheus metrics
+setup_metrics(app)
 
 
+async def startup_span():
+    settings = get_settings()
 
-settings = get_settings()  # load settings once
+    postgres_conn = f"postgresql+asyncpg://{settings.POSTGRES_USERNAME}:{settings.POSTGRES_PASSWORD}@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_MAIN_DATABASE}"
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # --- startup ---
-    app.mongo_conn = AsyncIOMotorClient(settings.MONGODB_URL)
-    app.db_client = app.mongo_conn[settings.MONGODB_DATABASE]
-    print("MongoDB connected")
+    app.db_engine = create_async_engine(postgres_conn)
+    app.db_client = sessionmaker(
+        app.db_engine, class_=AsyncSession, expire_on_commit=False
+    )
 
     llm_provider_factory = LLMProviderFactory(settings)
+    vectordb_provider_factory = VectorDBProviderFactory(config=settings, db_client=app.db_client)
 
-        # generation client
+    # generation client
     app.generation_client = llm_provider_factory.create(provider=settings.GENERATION_BACKEND)
     app.generation_client.set_generation_model(model_id = settings.GENERATION_MODEL_ID)
 
@@ -30,28 +38,24 @@ async def lifespan(app: FastAPI):
                                              embedding_size=settings.EMBEDDING_MODEL_SIZE)
     
     # vector db client
-    app.vectordb_client = VectorDBProviderFactory.create(
+    app.vectordb_client = vectordb_provider_factory.create(
         provider=settings.VECTOR_DB_BACKEND
     )
-    app.vectordb_client.connect()
-    
-    yield  # application runs after this
+    await app.vectordb_client.connect()
 
-    # --- shutdown ---
-    app.mongo_conn.close()
-    app.vectordb_client.disconnect()
-
-    # why this happens here
     app.template_parser = TemplateParser(
-    language=settings.PRIMARY_LANG,
-    default_language=settings.DEFAULT_LANG,
+        language=settings.PRIMARY_LANG,
+        default_language=settings.DEFAULT_LANG,
     )
 
 
-app = FastAPI(lifespan=lifespan)
+async def shutdown_span():
+    await app.db_engine.dispose()
+    await app.vectordb_client.disconnect()
+
+app.on_event("startup")(startup_span)
+app.on_event("shutdown")(shutdown_span)
 
 app.include_router(base.base_router)
 app.include_router(data.data_router)
 app.include_router(nlp.nlp_router)
-
-
